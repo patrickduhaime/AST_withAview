@@ -1,11 +1,6 @@
 package ast_withaview;
 
-import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -21,12 +16,6 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.IMethodBinding;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.internal.corext.callhierarchy.CallHierarchy;
 import org.eclipse.jdt.internal.corext.callhierarchy.MethodWrapper;
 import org.eclipse.swt.widgets.Composite;
@@ -48,9 +37,6 @@ public class ASTView extends ViewPart {
 	private static final String JDT_NATURE = "org.eclipse.jdt.core.javanature";
 	private TableViewer viewer;
 	private Action doubleClickAction;
-	private  Dictionary<String, Classe> table = new Hashtable<String, Classe>();
-	 
-
 	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 		public String getColumnText(Object obj, int index) {
 			return getText(obj);
@@ -148,7 +134,6 @@ public class ASTView extends ViewPart {
 
 	    private void analyseMethods(IProject project) throws JavaModelException {
         IPackageFragment[] packages = JavaCore.create(project).getPackageFragments();
-        // parse(JavaCore.create(project));
         for (IPackageFragment mypackage : packages) {
             if (mypackage.getKind() == IPackageFragmentRoot.K_SOURCE) {
                 createAST(mypackage);
@@ -157,21 +142,9 @@ public class ASTView extends ViewPart {
         }
     }
 
-	    @SuppressWarnings("deprecation")
 		private void createAST(IPackageFragment mypackage) throws JavaModelException {
         for (ICompilationUnit unit : mypackage.getCompilationUnits()) {
         	printIMethods(unit);
-        	/*/ now create the AST for the ICompilationUnits
-            CompilationUnit parse = parse(unit);
-            MethodVisitor visitor = new MethodVisitor();
-            parse.accept(visitor);
-            System.out.println(parse.getFlags());
-            int totalMethod = 0;
-            for (MethodDeclaration method : visitor.getMethods()) {
-            	totalMethod++;
-				System.out.println("--Method name: "+ method.getName());
-			}
-            System.out.println(totalMethod);*/
 	    }
 	}
 
@@ -186,53 +159,16 @@ public class ASTView extends ViewPart {
         IMethod[] methods = type.getMethods();
         for (IMethod method : methods) {
             HashSet<IMethod> callers = getCallersOf(method);
-            for(IMethod caller : callers)
-            {	            		
-            	String[] parts = caller.toString().split(" ");
-            	for(String part:parts)
-            	{
-            		if(part.contains(".java"))
-            		{
-            			System.out.print("La classe: " + part.substring(0, part.lastIndexOf('.')) + " a une reference vers: ");
-            		}
-            	}
-            	String s = caller.getParent().getElementName();	            	
-            	Classe c1 = table.get(s);
-       
-            	if(c1 != null)
-	            {
-	            	c1.setMethodCount(c1.getMethodCount()+ 1);
-	            	System.out.println(table.get(caller.getParent().getElementName()).getName());
-	            }
-	            else
-	            {
-	            	Classe c = new Classe(s);
-	            	c.setMethodCount(c.getMethodCount()+ 1);
-	            	table.put(s, c);
-	            	System.out.println(table.get(caller.getParent().getElementName()).getName());
-	            	
-	            }
-
+                       for(IMethod caller : callers)
+            {
+               System.out.println("Methode: "+method.getElementName());
+        	   System.out.println("Parent de la methode: "+method.getParent().getElementName());
+               System.out.println("Appelant de la methode: "+caller.getElementName());
+               System.out.println("Parent de l'appelant: "+caller.getParent().getElementName());
+               System.out.println("La classe: " + caller.getParent().getElementName() + " a une reference vers: " + method.getParent().getElementName() + "\n");
             }
         }
     }
-	    /**
-	     * Reads a ICompilationUnit and creates the AST DOM for manipulating the
-	     * Java source file
-	     *
-	     * @param unit
-	     * @return
-	     */
-
-	    private static CompilationUnit parse(ICompilationUnit unit) {
-        @SuppressWarnings("deprecation")
-		ASTParser parser = ASTParser.newParser(AST.JLS3);
-        parser.setKind(ASTParser.K_COMPILATION_UNIT);
-        parser.setSource(unit);
-        parser.setResolveBindings(true);
-        return (CompilationUnit) parser.createAST(null); // parse
-    }
-	    
 	    @SuppressWarnings("restriction")
 	    public HashSet<IMethod> getCallersOf(IMethod m) {
 	    	 
