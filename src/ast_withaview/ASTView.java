@@ -1,7 +1,9 @@
 package ast_withaview;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -22,6 +24,8 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.internal.corext.callhierarchy.CallHierarchy;
 import org.eclipse.jdt.internal.corext.callhierarchy.MethodWrapper;
@@ -44,6 +48,7 @@ public class ASTView extends ViewPart {
 	private static final String JDT_NATURE = "org.eclipse.jdt.core.javanature";
 	private TableViewer viewer;
 	private Action doubleClickAction;
+	private  Dictionary<String, Classe> table = new Hashtable<String, Classe>();
 	 
 
 	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
@@ -178,15 +183,39 @@ public class ASTView extends ViewPart {
 	    }
 	    
 	    private void printIMethodDetails(IType type) throws JavaModelException {
-	        IMethod[] methods = type.getMethods();
-	        for (IMethod method : methods) {
-	        	
-	            System.out.println("\n\nMethod name " + method.getElementName());
-	            HashSet<IMethod> callers = getCallersOf(method);
-	            for(IMethod caller : callers)
-	            	System.out.println(caller);
-	        }
-	    }
+        IMethod[] methods = type.getMethods();
+        for (IMethod method : methods) {
+            HashSet<IMethod> callers = getCallersOf(method);
+            for(IMethod caller : callers)
+            {	            		
+            	String[] parts = caller.toString().split(" ");
+            	for(String part:parts)
+            	{
+            		if(part.contains(".java"))
+            		{
+            			System.out.print("La classe: " + part.substring(0, part.lastIndexOf('.')) + " a une reference vers: ");
+            		}
+            	}
+            	String s = caller.getParent().getElementName();	            	
+            	Classe c1 = table.get(s);
+       
+            	if(c1 != null)
+	            {
+	            	c1.setMethodCount(c1.getMethodCount()+ 1);
+	            	System.out.println(table.get(caller.getParent().getElementName()).getName());
+	            }
+	            else
+	            {
+	            	Classe c = new Classe(s);
+	            	c.setMethodCount(c.getMethodCount()+ 1);
+	            	table.put(s, c);
+	            	System.out.println(table.get(caller.getParent().getElementName()).getName());
+	            	
+	            }
+
+            }
+        }
+    }
 	    /**
 	     * Reads a ICompilationUnit and creates the AST DOM for manipulating the
 	     * Java source file
