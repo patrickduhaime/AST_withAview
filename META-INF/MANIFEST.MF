@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: AST_withAview
+Bundle-SymbolicName: AST_withAview;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: ast_withaview.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.jdt.ui;bundle-version="3.12.2",
+ org.eclipse.jdt.core;bundle-version="3.12.3",
+ org.eclipse.core.resources;bundle-version="3.11.1"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
