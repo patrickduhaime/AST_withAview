@@ -28,6 +28,7 @@ import org.eclipse.ui.*;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.SWT;
 
+@SuppressWarnings("restriction")
 public class ASTView extends ViewPart {
 
 	/**
@@ -169,7 +170,6 @@ public class ASTView extends ViewPart {
             }
         }
     }
-	    @SuppressWarnings("restriction")
 	    public HashSet<IMethod> getCallersOf(IMethod m) {
 	    	 
 	    	 CallHierarchy callHierarchy = CallHierarchy.getDefault();
@@ -186,8 +186,7 @@ public class ASTView extends ViewPart {
 	    	 
 	    	return callers;
 	    	}
-	    	@SuppressWarnings("restriction")
-	    	 HashSet<IMethod> getIMethods( MethodWrapper[] methodWrappers) {
+	    	HashSet<IMethod> getIMethods( MethodWrapper[] methodWrappers) {
 	    	  HashSet<IMethod> c = new HashSet<IMethod>(); 
 	    	  for (MethodWrapper m : methodWrappers) {
 	    	   IMethod im = getIMethodFromMethodWrapper(m);
@@ -198,8 +197,7 @@ public class ASTView extends ViewPart {
 	    	  return c;
 	    	 }
 	    	 
-	    	 @SuppressWarnings("restriction")
-			IMethod getIMethodFromMethodWrapper( MethodWrapper m) {
+	    	 IMethod getIMethodFromMethodWrapper( MethodWrapper m) {
 	    	  try {
 			IMember im = m.getMember();
 	    	   if (im.getElementType() == IJavaElement.METHOD) {
